@@ -39,6 +39,8 @@ class Campsite extends Equatable {
   factory Campsite.fromJson(Map<String, dynamic> json) => _$CampsiteFromJson(json);
   Map<String, dynamic> toJson() => _$CampsiteToJson(this);
 
+  double get priceInEuros => pricePerNight / 100;
+
   @override
   List<Object?> get props => [
     id,

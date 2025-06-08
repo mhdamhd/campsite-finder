@@ -1,3 +1,4 @@
+import 'package:campsite_finder/presentation/views/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,7 +27,7 @@ final _router = GoRouter(
     GoRoute(
       path: '/',
       name: 'home',
-      builder: (context, state) => const Placeholder(),
+      builder: (context, state) => const HomeView(),
     ),
   ],
 );
