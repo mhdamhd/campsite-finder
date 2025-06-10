@@ -1,3 +1,4 @@
+import 'package:campsite_finder/core/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/campsite.dart';
@@ -31,19 +32,22 @@ class _CampsiteCardState extends State<CampsiteCard>
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: Card(
-          elevation: 3,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildImageSection(),
-              _buildContentSection(),
-            ],
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: Card(
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildImageSection(),
+                _buildContentSection(),
+              ],
+            ),
           ),
         ),
       ),
@@ -51,8 +55,10 @@ class _CampsiteCardState extends State<CampsiteCard>
   }
 
   Widget _buildImageSection() {
-    return AspectRatio(
-      aspectRatio: 4 / 3,
+    // return AspectRatio(
+      // aspectRatio: 4 / 3,
+    return Expanded(
+      flex: 3,
       child: Container(
         width: double.infinity,
         decoration: const BoxDecoration(
@@ -119,19 +125,23 @@ class _CampsiteCardState extends State<CampsiteCard>
   }
 
   Widget _buildContentSection() {
-    return Padding(
-      padding: const EdgeInsets.all(AppConstants.paddingMedium),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildTitle(),
-          const SizedBox(height: AppConstants.paddingSmall),
-          _buildLocation(),
-          const SizedBox(height: AppConstants.paddingSmall),
-          _buildFeatures(),
-          const SizedBox(height: AppConstants.paddingSmall),
-          _buildLanguages(),
-        ],
+    return Expanded(
+      flex: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(AppConstants.paddingMedium),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildTitle(),
+            const SizedBox(height: AppConstants.paddingSmall),
+            _buildLocation(),
+            const SizedBox(height: AppConstants.paddingSmall),
+            _buildFeatures(),
+            const SizedBox(height: AppConstants.paddingSmall),
+            // const Spacer(),
+            _buildLanguages(),
+          ],
+        ),
       ),
     );
   }
@@ -158,7 +168,6 @@ class _CampsiteCardState extends State<CampsiteCard>
         const SizedBox(width: 4),
         Expanded(
           child: Text(
-            ///TODO: figure out what to do with the country
             widget.campsite.country ?? '',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Colors.grey[600],
@@ -226,7 +235,7 @@ class _CampsiteCardState extends State<CampsiteCard>
         const SizedBox(width: 4),
         Expanded(
           child: Text(
-            widget.campsite.hostLanguages.join(', '),
+            widget.campsite.hostLanguages.map((code) => code.toLanguageName()).join(', '),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Colors.grey[600],
             ),

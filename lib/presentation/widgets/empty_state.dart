@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-class LoadingWidget extends StatelessWidget {
+class EmptyState extends StatelessWidget {
+  const EmptyState({super.key, required this.message});
   final String message;
-  const LoadingWidget({super.key, this.message = "loading"});
 
   @override
   Widget build(BuildContext context) {
@@ -10,9 +10,9 @@ class LoadingWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(height: 250),
+        Icon(Icons.search_off),
+        const SizedBox(height: 15),
         Text(message),
-        const SizedBox(height: 8),
-        const CircularProgressIndicator(),
       ],
     ));
   }
