@@ -1,4 +1,5 @@
 
+import 'package:campsite_finder/core/utils/extensions.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -10,7 +11,6 @@ class Campsite extends Equatable {
   final String label;
   final String photo;
   final GeoLocation geoLocation;
-  final String? country;
   @JsonKey(name: 'isCloseToWater')
   final bool isCloseToWater;
   @JsonKey(name: 'isCampFireAllowed')
@@ -27,7 +27,6 @@ class Campsite extends Equatable {
     required this.label,
     required this.photo,
     required this.geoLocation,
-    this.country,
     required this.isCloseToWater,
     required this.isCampFireAllowed,
     required this.hostLanguages,
@@ -41,13 +40,15 @@ class Campsite extends Equatable {
 
   double get priceInEuros => pricePerNight / 100;
 
+  String get country => geoLocation.country;
+
+
   @override
   List<Object?> get props => [
     id,
     label,
     photo,
     geoLocation,
-    country,
     isCloseToWater,
     isCampFireAllowed,
     hostLanguages,
@@ -68,7 +69,116 @@ class GeoLocation extends Equatable{
   factory GeoLocation.fromJson(Map<String, dynamic> json) => _$GeoLocationFromJson(json);
   Map<String, dynamic> toJson() => _$GeoLocationToJson(this);
 
+  /// Normalized latitude
+  double get normalizedLat => lat / 1000;
+
+  /// Normalized longitude
+  double get normalizedLng => lng / 1000;
+
   @override
   // TODO: implement props
   List<Object?> get props => [lat, lng];
+}
+
+
+class CampsiteFilters {
+  final String? searchQuery;
+  final bool? closeToWater;
+  final bool? campFireAllowed;
+  final List<String>? hostLanguages;
+  final double? maxPrice;
+  final double? minPrice;
+  final String? country;
+
+  const CampsiteFilters({
+    this.searchQuery,
+    this.closeToWater,
+    this.campFireAllowed,
+    this.hostLanguages,
+    this.maxPrice,
+    this.minPrice,
+    this.country,
+  });
+
+  static const _undefined = Object();
+
+  CampsiteFilters copyWith({
+    Object? searchQuery = _undefined,
+    Object? closeToWater = _undefined,
+    Object? campFireAllowed = _undefined,
+    Object? hostLanguages = _undefined,
+    Object? maxPrice = _undefined,
+    Object? minPrice = _undefined,
+    Object? country = _undefined,
+  }) {
+    return CampsiteFilters(
+      searchQuery: searchQuery == _undefined ? this.searchQuery : searchQuery as String?,
+      closeToWater: closeToWater == _undefined ? this.closeToWater : closeToWater as bool?,
+      campFireAllowed: campFireAllowed == _undefined ? this.campFireAllowed : campFireAllowed as bool?,
+      hostLanguages: hostLanguages == _undefined ? this.hostLanguages : hostLanguages as List<String>?,
+      maxPrice: maxPrice == _undefined ? this.maxPrice : maxPrice as double?,
+      minPrice: minPrice == _undefined ? this.minPrice : minPrice as double?,
+      country: country == _undefined ? this.country : country as String?,
+    );
+  }
+
+  bool get hasActiveFilters =>
+      searchQuery?.isNotEmpty == true ||
+          closeToWater != null ||
+          campFireAllowed != null ||
+          hostLanguages?.isNotEmpty == true ||
+          maxPrice != null ||
+          minPrice != null ||
+          country?.isNotEmpty == true;
+
+  int get activeFilterCount {
+    int count = 0;
+    if (searchQuery?.isNotEmpty == true) count++;
+    if (closeToWater != null) count++;
+    if (campFireAllowed != null) count++;
+    if (hostLanguages?.isNotEmpty == true) count++;
+    if (maxPrice != null) count++;
+    if (minPrice != null) count++;
+    if (country?.isNotEmpty == true) count++;
+    return count;
+  }
+
+  bool matches(Campsite campsite) {
+    if (searchQuery?.isNotEmpty == true) {
+      final query = searchQuery!.toLowerCase();
+      if (!campsite.label.toLowerCase().contains(query) &&
+          !campsite.country.toLowerCase().contains(query)) {
+        return false;
+      }
+    }
+
+    if (closeToWater != null && campsite.isCloseToWater != closeToWater) {
+      return false;
+    }
+
+    if (campFireAllowed != null && campsite.isCampFireAllowed != campFireAllowed) {
+      return false;
+    }
+
+    if (hostLanguages?.isNotEmpty == true) {
+      final hasMatchingLanguage = hostLanguages!.any(
+            (lang) => campsite.hostLanguages.contains(lang),
+      );
+      if (!hasMatchingLanguage) return false;
+    }
+
+    if (minPrice != null && campsite.priceInEuros < minPrice!) {
+      return false;
+    }
+
+    if (maxPrice != null && campsite.priceInEuros > maxPrice!) {
+      return false;
+    }
+
+    if (country?.isNotEmpty == true && campsite.country != country) {
+      return false;
+    }
+
+    return true;
+  }
 }

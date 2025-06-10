@@ -25,6 +25,7 @@ class ApiService {
     } on DioException catch (e) {
       throw _handleDioError(e);
     } catch (e) {
+      if (e is ApiException) rethrow;
       throw ApiException('Unexpected error occured: $e', 0);
     }
   }
