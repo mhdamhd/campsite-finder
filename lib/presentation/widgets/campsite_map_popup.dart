@@ -54,25 +54,28 @@ class CampsiteMapPopup extends StatelessWidget {
               ),
               child: AspectRatio(
                 aspectRatio: 4 / 3,
-                child: CachedNetworkImage(
-                  imageUrl: campsite.photo,
-                  fit: BoxFit.cover,
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.grey[300],
-                    child: const Icon(
-                      Icons.image_not_supported,
-                      size: 50,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  placeholder: (context, url) {
-                    return Container(
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: CircularProgressIndicator(),
+                child: Hero(
+                  tag: "Campsite:${campsite.id}",
+                  child: CachedNetworkImage(
+                    imageUrl: campsite.photo,
+                    fit: BoxFit.cover,
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.grey[300],
+                      child: const Icon(
+                        Icons.image_not_supported,
+                        size: 50,
+                        color: Colors.grey,
                       ),
-                    );
-                  },
+                    ),
+                    placeholder: (context, url) {
+                      return Container(
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
