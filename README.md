@@ -24,6 +24,10 @@ A Flutter web application for discovering and exploring campsites. Built as part
 - **Loading States**: Smooth loading indicators and skeleton screens
 - **Navigation**: Clean routing with GoRouter
 
+## 🚀 Live Demo
+
+**[View Live App](https://mhdamhd.github.io/campsite-finder/)**
+
 ## 🛠️ Tech Stack
 
 - **Framework**: Flutter 3.32.2
