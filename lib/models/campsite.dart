@@ -2,8 +2,12 @@
 import 'package:campsite_finder/core/utils/extensions.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'dart:math';
 
 part 'campsite.g.dart';
+
+
+final _random = Random();
 
 @JsonSerializable()
 class Campsite extends Equatable {
@@ -58,7 +62,6 @@ class Campsite extends Equatable {
   ];
 }
 
-@JsonSerializable()
 class GeoLocation extends Equatable{
   final double lat;
   @JsonKey(name: 'long')
@@ -66,14 +69,27 @@ class GeoLocation extends Equatable{
 
   const GeoLocation({required this.lat, required this.lng});
 
-  factory GeoLocation.fromJson(Map<String, dynamic> json) => _$GeoLocationFromJson(json);
-  Map<String, dynamic> toJson() => _$GeoLocationToJson(this);
+  /// Factory to generate a random GeoLocation inside Europe
+  factory GeoLocation.random() {
+    final lat = 35 + _random.nextDouble() * (70 - 35); // 35 to 70 N
+    final lng = -10 + _random.nextDouble() * (30 - (-10)); // -10 to 30 E
+    return GeoLocation(lat: lat, lng: lng);
+  }
+
+  factory GeoLocation.fromJson(Map<String, dynamic> json) {
+    return GeoLocation.random(); // Always use random lat/lng
+  }
+
+  Map<String, dynamic> toJson() => {
+    'lat': lat,
+    'long': lng,
+  };
 
   /// Normalized latitude
-  double get normalizedLat => lat / 1000;
+  double get normalizedLat => lat;
 
   /// Normalized longitude
-  double get normalizedLng => lng / 1000;
+  double get normalizedLng => lng;
 
   @override
   // TODO: implement props

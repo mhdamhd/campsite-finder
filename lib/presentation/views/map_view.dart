@@ -22,7 +22,14 @@ class _MapViewState extends ConsumerState<MapView> {
   final MapController _mapController = MapController();
   final double _defaultZoom = 6.0;
   final LatLng _defaultCenter = LatLng(51.1657, 10.4515); // Germany center
+  double _currentZoom = 6.0;
+  bool _useClusteringMode = true;
 
+  @override
+  void initState() {
+    super.initState();
+    _currentZoom = _defaultZoom;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +41,15 @@ class _MapViewState extends ConsumerState<MapView> {
         backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
         actions: [
+          IconButton(
+            icon: Icon(_useClusteringMode ? Icons.scatter_plot : Icons.location_on),
+            onPressed: () {
+              setState(() {
+                _useClusteringMode = !_useClusteringMode;
+              });
+            },
+            tooltip: _useClusteringMode ? 'Disable clustering' : 'Enable clustering',
+          ),
           IconButton(
             icon: const Icon(Icons.my_location),
             onPressed: _centerMapOnCampsites,
@@ -58,11 +74,17 @@ class _MapViewState extends ConsumerState<MapView> {
       mapController: _mapController,
       options: MapOptions(
         initialCenter: _getMapCenter(campsites),
-        // initialCenter: LatLng(campsites.first.geoLocation.normalizedLat, campsites.first.geoLocation.normalizedLng),
         initialZoom: _defaultZoom,
         minZoom: 3.0,
         maxZoom: 18.0,
-        interactionOptions: InteractionOptions(flags: InteractiveFlag.all),
+        interactionOptions: const InteractionOptions(flags: InteractiveFlag.all),
+        onMapEvent: (MapEvent mapEvent) {
+          if (mapEvent is MapEventMove || mapEvent is MapEventScrollWheelZoom  || mapEvent is MapEventDoubleTapZoom) {
+            setState(() {
+              _currentZoom = mapEvent.camera.zoom;
+            });
+          }
+        },
       ),
       children: [
         TileLayer(
@@ -70,11 +92,11 @@ class _MapViewState extends ConsumerState<MapView> {
           userAgentPackageName: 'com.example.campsite_finder',
           maxZoom: 19,
         ),
-        MarkerLayer(
-          markers:  _buildMarkers(campsites),
-        ),
-        // Add clustering markers for better performance with many campsites
-        if (campsites.length > 50) _buildClusterLayer(campsites),
+        // Use clustering or regular markers based on settings and campsite count
+        if (_useClusteringMode && campsites.length > 10)
+          _buildClusterLayer(campsites)
+        else
+          MarkerLayer(markers: _buildMarkers(campsites)),
       ],
     );
   }
@@ -133,7 +155,7 @@ class _MapViewState extends ConsumerState<MapView> {
   }
 
   Widget _buildClusterLayer(List<Campsite> campsites) {
-    final clusters = _createClusters(campsites, _mapController.camera.zoom);
+    final clusters = _createClusters(campsites, _currentZoom);
 
     return MarkerLayer(
       markers: clusters.map((cluster) {
@@ -153,6 +175,13 @@ class _MapViewState extends ConsumerState<MapView> {
                     color: Theme.of(context).primaryColor,
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: const Icon(
                     Icons.location_pin,
@@ -161,23 +190,31 @@ class _MapViewState extends ConsumerState<MapView> {
                   ),
                 ),
               ),
-            ) ,
+            ),
           );
         } else {
           // Cluster marker
+          final clusterSize = _getClusterSize(cluster.campsites.length);
           return Marker(
             point: cluster.center,
-            width: 60,
-            height: 60,
+            width: clusterSize,
+            height: clusterSize,
             child: MouseRegion(
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
                 onTap: () => _zoomToCluster(cluster),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.8),
+                    color: _getClusterColor(cluster.campsites.length),
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Center(
                     child: Text(
@@ -185,7 +222,7 @@ class _MapViewState extends ConsumerState<MapView> {
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 14,
                       ),
                     ),
                   ),
@@ -199,7 +236,6 @@ class _MapViewState extends ConsumerState<MapView> {
   }
 
   List<CampsiteCluster> _createClusters(List<Campsite> campsites, double zoom) {
-    // Simple clustering algorithm - group campsites within a certain distance
     final clusters = <CampsiteCluster>[];
     final processed = <String>{};
     final double clusterDistance = _getClusterDistance(zoom);
@@ -251,12 +287,30 @@ class _MapViewState extends ConsumerState<MapView> {
   }
 
   double _getClusterDistance(double zoom) {
-    // Adjust clustering distance based on zoom level
-    if (zoom <= 5) return 100; // 100km
+    // More aggressive clustering at lower zoom levels
+    if (zoom <= 4) return 500; // 600km
+    if (zoom <= 6) return 200; // 200km
     if (zoom <= 8) return 50;  // 50km
     if (zoom <= 10) return 25; // 25km
     if (zoom <= 12) return 10; // 10km
-    return 5; // 5km
+    if (zoom <= 14) return 5;  // 5km
+    return 2; // 2km for high zoom levels
+  }
+
+  double _getClusterSize(int clusterSize) {
+    if (clusterSize < 5) return 50.0;
+    if (clusterSize < 10) return 60.0;
+    if (clusterSize < 20) return 70.0;
+    if (clusterSize < 50) return 80.0;
+    return 90.0;
+  }
+
+  Color _getClusterColor(int clusterSize) {
+    if (clusterSize < 5) return Colors.blue;
+    if (clusterSize < 10) return Colors.green;
+    if (clusterSize < 20) return Colors.orange;
+    if (clusterSize < 50) return Colors.red;
+    return Colors.purple;
   }
 
   void _showCampsitePopup(BuildContext context, Campsite campsite) {
@@ -280,24 +334,31 @@ class _MapViewState extends ConsumerState<MapView> {
   void _zoomToCluster(CampsiteCluster cluster) {
     // Calculate bounds for the cluster
     final bounds = _calculateBounds(cluster.campsites);
-    final cameraFit = CameraFit.bounds(bounds: bounds, padding: EdgeInsets.all(50));
+    final cameraFit = CameraFit.bounds(
+      bounds: bounds,
+      padding: const EdgeInsets.all(50),
+    );
     _mapController.fitCamera(cameraFit);
-    // _mapController.camera.fitBounds(bounds, options: const FitBoundsOptions(
-    //   padding: EdgeInsets.all(50),
-    // ));
   }
 
   LatLngBounds _calculateBounds(List<Campsite> campsites) {
+    if (campsites.isEmpty) {
+      return LatLngBounds(_defaultCenter, _defaultCenter);
+    }
+
     double minLat = campsites.first.geoLocation.normalizedLat;
     double maxLat = campsites.first.geoLocation.normalizedLat;
     double minLng = campsites.first.geoLocation.normalizedLng;
     double maxLng = campsites.first.geoLocation.normalizedLng;
 
     for (final campsite in campsites) {
-      minLat = minLat < campsite.geoLocation.normalizedLat ? minLat : campsite.geoLocation.normalizedLat;
-      maxLat = maxLat > campsite.geoLocation.normalizedLat ? maxLat : campsite.geoLocation.normalizedLat;
-      minLng = minLng < campsite.geoLocation.normalizedLng ? minLng : campsite.geoLocation.normalizedLng;
-      maxLng = maxLng > campsite.geoLocation.normalizedLng ? maxLng : campsite.geoLocation.normalizedLng;
+      final lat = campsite.geoLocation.normalizedLat;
+      final lng = campsite.geoLocation.normalizedLng;
+
+      if (lat < minLat) minLat = lat;
+      if (lat > maxLat) maxLat = lat;
+      if (lng < minLng) minLng = lng;
+      if (lng > maxLng) maxLng = lng;
     }
 
     return LatLngBounds(
@@ -311,10 +372,11 @@ class _MapViewState extends ConsumerState<MapView> {
     filteredCampsites.whenData((campsites) {
       if (campsites.isNotEmpty) {
         final bounds = _calculateBounds(campsites);
-        final cameraFit = CameraFit.bounds(bounds: bounds, padding: EdgeInsets.all(50));
-        // _mapController.fitBounds(bounds, options: const FitBoundsOptions(
-        //   padding: EdgeInsets.all(50),
-        // ));
+        final cameraFit = CameraFit.bounds(
+          bounds: bounds,
+          padding: const EdgeInsets.all(50),
+        );
+        _mapController.fitCamera(cameraFit);
       }
     });
   }

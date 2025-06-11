@@ -37,11 +37,3 @@ Map<String, dynamic> _$CampsiteToJson(Campsite instance) => <String, dynamic>{
   'suitableFor': instance.suitableFor,
   'createdAt': instance.createdAt.toIso8601String(),
 };
-
-GeoLocation _$GeoLocationFromJson(Map<String, dynamic> json) => GeoLocation(
-  lat: (json['lat'] as num).toDouble(),
-  lng: (json['long'] as num).toDouble(),
-);
-
-Map<String, dynamic> _$GeoLocationToJson(GeoLocation instance) =>
-    <String, dynamic>{'lat': instance.lat, 'long': instance.lng};
