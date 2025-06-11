@@ -32,17 +32,14 @@ class _HomeViewState extends ConsumerState<HomeView>
   @override
   void dispose() {
     _scrollController.dispose();
-    // _fabAnimationController.dispose();
     super.dispose();
   }
 
   void _onScroll() {
     if (_scrollController.offset > 100 && !_showFab) {
       setState(() => _showFab = true);
-      // _fabAnimationController.forward();
     } else if (_scrollController.offset <= 100 && _showFab) {
       setState(() => _showFab = false);
-      // _fabAnimationController.reverse();
     }
   }
 
@@ -74,7 +71,6 @@ class _HomeViewState extends ConsumerState<HomeView>
         controller: _scrollController,
         slivers: [
           _buildSliverAppBar(context, filters),
-          // _buildSearchSection(),
           _buildFilterChipBar(),
           _buildCampsiteList(filteredCampsites),
         ],
@@ -157,6 +153,67 @@ class _HomeViewState extends ConsumerState<HomeView>
   }
 
   Widget _buildCampsiteList(AsyncValue<List<Campsite>> campsitesAsync) {
+    return campsitesAsync.when(
+      loading: () => const SliverToBoxAdapter(
+        child: LoadingWidget(message: AppConstants.loadingCampsites),
+      ),
+      error: (error, stack) => SliverToBoxAdapter(
+        child: ErrorWidgetCustom(
+          message: error.toString(),
+          onRetry: () => ref.invalidate(campsitesProvider),
+        ),
+      ),
+      data: (campsites) {
+        if (campsites.isEmpty) {
+          return const SliverToBoxAdapter(
+            child: EmptyState(
+              message: "No Campsites Found",
+            ),
+          );
+        }
+
+        return SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(AppConstants.paddingMedium),
+            child: Wrap(
+              spacing: AppConstants.paddingMedium,
+              runSpacing: AppConstants.paddingMedium,
+              children: campsites.map((campsite) {
+                return SizedBox(
+                  width: _getCardWidth(context),
+                  child: CampsiteCard(
+                    campsite: campsite,
+                    onTap: () => context.pushNamed(
+                      'campsite_detail',
+                      pathParameters: {'id': campsite.id},
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  double _getCardWidth(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final padding = AppConstants.paddingMedium * 2; // Left and right padding
+
+    if (screenWidth > AppConstants.desktopBreakpoint) {
+      // 3 cards per row on desktop
+      return (screenWidth - padding - (AppConstants.paddingMedium * 2)) / 3;
+    } else if (screenWidth > AppConstants.tabletBreakpoint) {
+      // 2 cards per row on tablet
+      return (screenWidth - padding - AppConstants.paddingMedium) / 2;
+    } else {
+      // 1 card per row on mobile
+      return screenWidth - padding;
+    }
+  }
+
+  Widget _buildCampsiteLists(AsyncValue<List<Campsite>> campsitesAsync) {
     return campsitesAsync.when(
       loading: () => const SliverToBoxAdapter(
         child: LoadingWidget(message: AppConstants.loadingCampsites),

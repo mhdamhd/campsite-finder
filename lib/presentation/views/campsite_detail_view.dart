@@ -71,18 +71,20 @@ class CampsiteDetailView extends ConsumerWidget {
               flex: 2,
               child: AspectRatio(
                 aspectRatio: 4 / 3,
-                // height: double.infinity,
                 child: ClipRRect(
-                  child: CachedNetworkImage(
-                    imageUrl: campsite.photo,
-                    fit: BoxFit.cover,
-                    errorWidget: (context, url, error) => Container(
-                      color: Colors.grey[300],
-                      child: const Center(
-                        child: Icon(
-                          Icons.image_not_supported,
-                          size: 100,
-                          color: Colors.grey,
+                  child: Hero(
+                    tag: "Campsite:${campsite.id}",
+                    child: CachedNetworkImage(
+                      imageUrl: campsite.photo,
+                      fit: BoxFit.cover,
+                      errorWidget: (context, url, error) => Container(
+                        color: Colors.grey[300],
+                        child: const Center(
+                          child: Icon(
+                            Icons.image_not_supported,
+                            size: 100,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
                     ),
@@ -124,22 +126,25 @@ class CampsiteDetailView extends ConsumerWidget {
             children: [
               AspectRatio(
                 aspectRatio: 4/3,
-                child: CachedNetworkImage(
-                  imageUrl: campsite.photo,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorWidget: (context, url, error) => Container(
-                    height: 250,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.image_not_supported, size: 100),
-                  ),
-                  placeholder: (context, url) {
-                    return Container(
+                child: Hero(
+                  tag: "Campsite:${campsite.id}",
+                  child: CachedNetworkImage(
+                    imageUrl: campsite.photo,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorWidget: (context, url, error) => Container(
                       height: 250,
-                      color: Colors.grey[200],
-                      child: const Center(child: CircularProgressIndicator()),
-                    );
-                  },
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.image_not_supported, size: 100),
+                    ),
+                    placeholder: (context, url) {
+                      return Container(
+                        height: 250,
+                        color: Colors.grey[200],
+                        child: const Center(child: CircularProgressIndicator()),
+                      );
+                    },
+                  ),
                 ),
               ),
               Positioned(
@@ -190,22 +195,25 @@ class CampsiteDetailView extends ConsumerWidget {
             children: [
               AspectRatio(
                 aspectRatio: 4/3,
-                child: CachedNetworkImage(
-                  imageUrl: campsite.photo,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorWidget: (context, url, error) => Container(
-                    height: 300,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.image_not_supported, size: 100),
-                  ),
-                  placeholder: (context, url) {
-                    return Container(
+                child: Hero(
+                  tag: "Campsite:${campsite.id}",
+                  child: CachedNetworkImage(
+                    imageUrl: campsite.photo,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorWidget: (context, url, error) => Container(
                       height: 300,
-                      color: Colors.grey[200],
-                      child: const Center(child: CircularProgressIndicator()),
-                    );
-                  },
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.image_not_supported, size: 100),
+                    ),
+                    placeholder: (context, url) {
+                      return Container(
+                        height: 300,
+                        color: Colors.grey[200],
+                        child: const Center(child: CircularProgressIndicator()),
+                      );
+                    },
+                  ),
                 ),
               ),
               Positioned(

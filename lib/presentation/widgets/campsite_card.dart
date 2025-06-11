@@ -27,7 +27,6 @@ class _CampsiteCardState extends State<CampsiteCard>
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -43,6 +42,7 @@ class _CampsiteCardState extends State<CampsiteCard>
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min, // Key change: Let column size itself
               children: [
                 _buildImageSection(),
                 _buildContentSection(),
@@ -55,10 +55,8 @@ class _CampsiteCardState extends State<CampsiteCard>
   }
 
   Widget _buildImageSection() {
-    // return AspectRatio(
-      // aspectRatio: 4 / 3,
-    return Expanded(
-      flex: 3,
+    return AspectRatio(
+      aspectRatio: 16 / 9, // Fixed aspect ratio for images only
       child: Container(
         width: double.infinity,
         decoration: const BoxDecoration(
@@ -73,21 +71,24 @@ class _CampsiteCardState extends State<CampsiteCard>
           child: Stack(
             fit: StackFit.expand,
             children: [
-              CachedNetworkImage(
-                imageUrl: widget.campsite.photo,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: Colors.grey[200],
-                  child: const Center(
-                    child: CircularProgressIndicator(),
+              Hero(
+                tag: "Campsite:${widget.campsite.id}",
+                child: CachedNetworkImage(
+                  imageUrl: widget.campsite.photo,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
                   ),
-                ),
-                errorWidget: (context, url, error) => Container(
-                  color: Colors.grey[200],
-                  child: const Icon(
-                    Icons.landscape,
-                    size: 50,
-                    color: Colors.grey,
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey[200],
+                    child: const Icon(
+                      Icons.landscape,
+                      size: 50,
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
               ),
@@ -125,23 +126,22 @@ class _CampsiteCardState extends State<CampsiteCard>
   }
 
   Widget _buildContentSection() {
-    return Expanded(
-      flex: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.paddingMedium),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTitle(),
+    return Padding(
+      padding: const EdgeInsets.all(AppConstants.paddingMedium),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min, // Let content size itself
+        children: [
+          _buildTitle(),
+          const SizedBox(height: AppConstants.paddingSmall),
+          _buildLocation(),
+          if (_hasLanguages()) ...[
             const SizedBox(height: AppConstants.paddingSmall),
-            _buildLocation(),
-            const SizedBox(height: AppConstants.paddingSmall),
-            _buildFeatures(),
-            const SizedBox(height: AppConstants.paddingSmall),
-            // const Spacer(),
             _buildLanguages(),
           ],
-        ),
+          const SizedBox(height: AppConstants.paddingSmall),
+          _buildFeatures(),
+        ],
       ),
     );
   }
@@ -184,16 +184,20 @@ class _CampsiteCardState extends State<CampsiteCard>
     final hasFeatures = widget.campsite.isCloseToWater ||
         widget.campsite.isCampFireAllowed;
 
-    if (!hasFeatures) return const SizedBox.shrink();
-    return Wrap(
-      spacing: 4,
-      runSpacing: 4,
-      children: [
-        if (widget.campsite.isCloseToWater)
-          _buildFeatureChip(Icons.water, 'Water nearby', Colors.blue),
-        if (widget.campsite.isCampFireAllowed)
-          _buildFeatureChip(Icons.local_fire_department, 'Campfire', Colors.orange),
-      ],
+    if (!hasFeatures) return const SizedBox(height: 20,);
+
+    return SizedBox(
+      height: 20,
+      child: Wrap(
+        spacing: 4,
+        runSpacing: 4,
+        children: [
+          if (widget.campsite.isCloseToWater)
+            _buildFeatureChip(Icons.water, 'Water nearby', Colors.blue),
+          if (widget.campsite.isCampFireAllowed)
+            _buildFeatureChip(Icons.local_fire_department, 'Campfire', Colors.orange),
+        ],
+      ),
     );
   }
 
@@ -223,8 +227,11 @@ class _CampsiteCardState extends State<CampsiteCard>
     );
   }
 
+  bool _hasLanguages() {
+    return widget.campsite.hostLanguages.isNotEmpty;
+  }
+
   Widget _buildLanguages() {
-    if (widget.campsite.hostLanguages.isEmpty) return SizedBox.shrink();
     return Row(
       children: [
         Icon(
