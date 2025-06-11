@@ -127,7 +127,7 @@ class CampsiteMapPopup extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '€${campsite.priceInEuros.toStringAsFixed(2)} per night',
+                          '${campsite.priceInEuros.toStringAsFixed(2)} per night',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Colors.green[600],
                             fontWeight: FontWeight.w600,
