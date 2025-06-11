@@ -37,7 +37,7 @@ class _MapViewState extends ConsumerState<MapView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Campsite Map'),
+        title: const Text('Campsite Map', style: TextStyle(color: Colors.white),),
         backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
         actions: [

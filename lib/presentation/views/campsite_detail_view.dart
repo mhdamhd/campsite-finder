@@ -23,10 +23,10 @@ class CampsiteDetailView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: MediaQuery.of(context).size.width > AppConstants.desktopBreakpoint ? Theme.of(context).primaryColor : Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: MediaQuery.of(context).size.width > AppConstants.desktopBreakpoint ? Colors.black : Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
         ),
       ),
@@ -71,7 +71,7 @@ class CampsiteDetailView extends ConsumerWidget {
         children: [
           // Left side - Image
           Expanded(
-            flex: 2,
+            flex: 10,
             child: AspectRatio(
               aspectRatio: 4 / 3,
               child: ClipRRect(
@@ -97,7 +97,7 @@ class CampsiteDetailView extends ConsumerWidget {
           ),
           // Right side - Content
           Expanded(
-            flex: 3,
+            flex: 8,
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 32),
               child: ConstrainedBox(

@@ -114,7 +114,7 @@ class _CampsiteCardState extends State<CampsiteCard>
           borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
         ),
         child: Text(
-          '${Formatters.formatPrecisePrice(widget.campsite.priceInEuros)}/night',
+          '${Formatters.formatPrecisePrice(widget.campsite.priceInEuros)}/Night',
           style: const TextStyle(
             color: Colors.white,
             fontSize: 12,

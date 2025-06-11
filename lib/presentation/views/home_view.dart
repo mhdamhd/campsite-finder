@@ -94,28 +94,44 @@ class _HomeViewState extends ConsumerState<HomeView>
     );
   }
 
-  Widget _buildSliverAppBar(BuildContext context, filters) {
+  Widget _buildSliverAppBar(BuildContext context, CampsiteFilters filters) {
+    final theme = Theme.of(context);
+
     return SliverAppBar(
-      expandedHeight: 120,
+      expandedHeight: 140,
       floating: true,
       pinned: true,
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: theme.primaryColor,
+      elevation: 6,
       flexibleSpace: FlexibleSpaceBar(
-        title: const Text(
-          'Campsite Finder',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+        titlePadding: const EdgeInsetsDirectional.only(start: 72, bottom: 16),
+        title: Row(
+          children: [
+            const CircleAvatar(
+              radius: 14,
+              backgroundImage: AssetImage('assets/logo.jpg'), // 🖼️ Your logo here
+              backgroundColor: Colors.transparent,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Campsite Finder',
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
         ),
         background: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
               colors: [
-                Theme.of(context).primaryColor,
-                Theme.of(context).primaryColor.withOpacity(0.8),
+                theme.primaryColor,
+                theme.primaryColor.withOpacity(0.85),
+                theme.primaryColor.withOpacity(0.7),
               ],
             ),
           ),
@@ -125,27 +141,26 @@ class _HomeViewState extends ConsumerState<HomeView>
         IconButton(
           icon: Stack(
             children: [
-              const Icon(Icons.tune, color: Colors.white),
+              const Icon(Icons.tune, color: Colors.white, size: 26),
               if (filters.hasActiveFilters)
                 Positioned(
                   right: 0,
                   top: 0,
                   child: Container(
                     padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
                       shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 1),
                     ),
-                    constraints: const BoxConstraints(
-                      minWidth: 12,
-                      minHeight: 12,
-                    ),
+                    constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
                     child: Text(
                       '${filters.activeFilterCount}',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 8,
+                        fontSize: 9,
                         fontWeight: FontWeight.bold,
+                        height: 1,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -153,8 +168,10 @@ class _HomeViewState extends ConsumerState<HomeView>
                 ),
             ],
           ),
+          tooltip: 'Filters',
           onPressed: _showFilterBottomSheet,
         ),
+        const SizedBox(width: 8),
       ],
     );
   }
