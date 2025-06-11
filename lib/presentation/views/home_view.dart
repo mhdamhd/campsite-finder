@@ -60,6 +60,14 @@ class _HomeViewState extends ConsumerState<HomeView>
     );
   }
 
+  Future<void> _onRefresh() async {
+    // Invalidate the campsites provider to trigger a fresh fetch
+    ref.invalidate(campsitesProvider);
+
+    // Wait for the new data to load
+    await ref.read(campsitesProvider.future);
+  }
+
   @override
   Widget build(BuildContext context) {
     final filteredCampsites = ref.watch(filteredCampsitesProvider);
@@ -67,13 +75,16 @@ class _HomeViewState extends ConsumerState<HomeView>
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          _buildSliverAppBar(context, filters),
-          _buildFilterChipBar(),
-          _buildCampsiteList(filteredCampsites),
-        ],
+      body: RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            _buildSliverAppBar(context, filters),
+            _buildFilterChipBar(),
+            _buildCampsiteList(filteredCampsites),
+          ],
+        ),
       ),
       floatingActionButton: _showFab ? FloatingActionButton(
         onPressed: _scrollToTop,
