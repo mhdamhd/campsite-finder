@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:campsite_finder/core/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -72,10 +73,10 @@ class CampsiteDetailView extends ConsumerWidget {
                 aspectRatio: 4 / 3,
                 // height: double.infinity,
                 child: ClipRRect(
-                  child: Image.network(
-                    campsite.photo,
+                  child: CachedNetworkImage(
+                    imageUrl: campsite.photo,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
+                    errorWidget: (context, url, error) => Container(
                       color: Colors.grey[300],
                       child: const Center(
                         child: Icon(
@@ -123,17 +124,16 @@ class CampsiteDetailView extends ConsumerWidget {
             children: [
               AspectRatio(
                 aspectRatio: 4/3,
-                child: Image.network(
-                  campsite.photo,
+                child: CachedNetworkImage(
+                  imageUrl: campsite.photo,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
+                  errorWidget: (context, url, error) => Container(
                     height: 250,
                     color: Colors.grey[300],
                     child: const Icon(Icons.image_not_supported, size: 100),
                   ),
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
+                  placeholder: (context, url) {
                     return Container(
                       height: 250,
                       color: Colors.grey[200],
@@ -190,17 +190,16 @@ class CampsiteDetailView extends ConsumerWidget {
             children: [
               AspectRatio(
                 aspectRatio: 4/3,
-                child: Image.network(
-                  campsite.photo,
+                child: CachedNetworkImage(
+                  imageUrl: campsite.photo,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
+                  errorWidget: (context, url, error) => Container(
                     height: 300,
                     color: Colors.grey[300],
                     child: const Icon(Icons.image_not_supported, size: 100),
                   ),
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
+                  placeholder: (context, url) {
                     return Container(
                       height: 300,
                       color: Colors.grey[200],
