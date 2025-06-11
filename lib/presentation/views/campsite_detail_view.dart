@@ -22,6 +22,15 @@ class CampsiteDetailView extends ConsumerWidget {
     final campsiteAsync = ref.watch(campsiteByIdProvider(campsiteId));
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: MediaQuery.of(context).size.width > AppConstants.desktopBreakpoint ? Colors.black : Colors.white),
+          onPressed: () => context.pop(),
+        ),
+      ),
+      extendBodyBehindAppBar: true,
       body: campsiteAsync.when(
         loading: () => const LoadingWidget(message: 'Loading campsite details...'),
         error: (error, stackTrace) => ErrorWidgetCustom(
@@ -55,36 +64,29 @@ class CampsiteDetailView extends ConsumerWidget {
   }
 
   Widget _buildDesktopLayout(BuildContext context, Campsite campsite) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(campsite.label),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-      ),
-      body: Center(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            // Left side - Image
-            Expanded(
-              flex: 2,
-              child: AspectRatio(
-                aspectRatio: 4 / 3,
-                child: ClipRRect(
-                  child: Hero(
-                    tag: "Campsite:${campsite.id}",
-                    child: CachedNetworkImage(
-                      imageUrl: campsite.photo,
-                      fit: BoxFit.cover,
-                      errorWidget: (context, url, error) => Container(
-                        color: Colors.grey[300],
-                        child: const Center(
-                          child: Icon(
-                            Icons.image_not_supported,
-                            size: 100,
-                            color: Colors.grey,
-                          ),
+    return Center(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          // Left side - Image
+          Expanded(
+            flex: 2,
+            child: AspectRatio(
+              aspectRatio: 4 / 3,
+              child: ClipRRect(
+                child: Hero(
+                  tag: "Campsite:${campsite.id}",
+                  child: CachedNetworkImage(
+                    imageUrl: campsite.photo,
+                    fit: BoxFit.cover,
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.grey[300],
+                      child: const Center(
+                        child: Icon(
+                          Icons.image_not_supported,
+                          size: 100,
+                          color: Colors.grey,
                         ),
                       ),
                     ),
@@ -92,27 +94,27 @@ class CampsiteDetailView extends ConsumerWidget {
                 ),
               ),
             ),
-            // Right side - Content
-            Expanded(
-              flex: 3,
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 32),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 800),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildCampsiteHeader(context, campsite),
-                      const SizedBox(height: 32),
-                      _buildDesktopContentGrid(context, campsite),
-                    ],
-                  ),
+          ),
+          // Right side - Content
+          Expanded(
+            flex: 3,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 32),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 800),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildCampsiteHeader(context, campsite),
+                    const SizedBox(height: 32),
+                    _buildDesktopContentGrid(context, campsite),
+                  ],
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -122,50 +124,28 @@ class CampsiteDetailView extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Stack(
-            children: [
-              AspectRatio(
-                aspectRatio: 4/3,
-                child: Hero(
-                  tag: "Campsite:${campsite.id}",
-                  child: CachedNetworkImage(
-                    imageUrl: campsite.photo,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorWidget: (context, url, error) => Container(
-                      height: 250,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.image_not_supported, size: 100),
-                    ),
-                    placeholder: (context, url) {
-                      return Container(
-                        height: 250,
-                        color: Colors.grey[200],
-                        child: const Center(child: CircularProgressIndicator()),
-                      );
-                    },
-                  ),
+          AspectRatio(
+            aspectRatio: 4/3,
+            child: Hero(
+              tag: "Campsite:${campsite.id}",
+              child: CachedNetworkImage(
+                imageUrl: campsite.photo,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorWidget: (context, url, error) => Container(
+                  height: 250,
+                  color: Colors.grey[300],
+                  child: const Icon(Icons.image_not_supported, size: 100),
                 ),
+                placeholder: (context, url) {
+                  return Container(
+                    height: 250,
+                    color: Colors.grey[200],
+                    child: const Center(child: CircularProgressIndicator()),
+                  );
+                },
               ),
-              Positioned(
-                top: 40,
-                left: 24,
-                child: MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () => context.pop(),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.3),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.arrow_back, color: Colors.white),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(24),
@@ -191,50 +171,28 @@ class CampsiteDetailView extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Stack(
-            children: [
-              AspectRatio(
-                aspectRatio: 4/3,
-                child: Hero(
-                  tag: "Campsite:${campsite.id}",
-                  child: CachedNetworkImage(
-                    imageUrl: campsite.photo,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorWidget: (context, url, error) => Container(
-                      height: 300,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.image_not_supported, size: 100),
-                    ),
-                    placeholder: (context, url) {
-                      return Container(
-                        height: 300,
-                        color: Colors.grey[200],
-                        child: const Center(child: CircularProgressIndicator()),
-                      );
-                    },
-                  ),
+          AspectRatio(
+            aspectRatio: 4/3,
+            child: Hero(
+              tag: "Campsite:${campsite.id}",
+              child: CachedNetworkImage(
+                imageUrl: campsite.photo,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorWidget: (context, url, error) => Container(
+                  height: 300,
+                  color: Colors.grey[300],
+                  child: const Icon(Icons.image_not_supported, size: 100),
                 ),
+                placeholder: (context, url) {
+                  return Container(
+                    height: 300,
+                    color: Colors.grey[200],
+                    child: const Center(child: CircularProgressIndicator()),
+                  );
+                },
               ),
-              Positioned(
-                top: 40,
-                left: 16,
-                child: MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () => context.pop(),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.3),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.arrow_back, color: Colors.white),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(AppConstants.paddingMedium),
