@@ -104,7 +104,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       backgroundColor: theme.primaryColor,
       elevation: 6,
       flexibleSpace: FlexibleSpaceBar(
-        titlePadding: const EdgeInsetsDirectional.only(start: 72, bottom: 16),
+        titlePadding: const EdgeInsetsDirectional.only(start: 35, bottom: 16),
         title: Row(
           children: [
             const CircleAvatar(
@@ -141,7 +141,7 @@ class _HomeViewState extends ConsumerState<HomeView>
         IconButton(
           icon: Stack(
             children: [
-              const Icon(Icons.tune, color: Colors.white, size: 26),
+              const Icon(Icons.tune, color: Colors.white, size: 30),
               if (filters.hasActiveFilters)
                 Positioned(
                   right: 0,

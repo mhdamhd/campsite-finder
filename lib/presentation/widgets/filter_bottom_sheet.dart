@@ -274,6 +274,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet>
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.withOpacity(0.3)),
         borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+        color: currentValue != null ? Theme.of(context).primaryColorLight.withOpacity(0.2) : Colors.transparent
       ),
       child: Column(
         children: [
@@ -460,7 +461,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet>
   Widget _buildSectionTitle(String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: Theme.of(context).primaryColor),
+        Icon(icon, size: 20, color: Colors.black),
         const SizedBox(width: AppConstants.paddingSmall),
         Text(
           title,

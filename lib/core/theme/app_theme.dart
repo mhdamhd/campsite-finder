@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 class AppTheme {
   // Colors
   // static const Color primaryColor = Color(0xFF2E7D32);
-  static const Color primaryColor = Color(0xFF5FC961);
+  static const Color primaryColor = Color(0xFF54B056);
   static const Color primaryDark = Color(0xFF1B5E20);
   static const Color primaryLight = Color(0xFF66BB6A);
   static const Color accentColor = Color(0xFFFF6B35);
@@ -129,7 +129,7 @@ class AppTheme {
         backgroundColor: primaryLight.withOpacity(0.1),
         selectedColor: primaryColor,
         labelStyle: const TextStyle(
-          color: primaryColor,
+          color: Colors.black,
           fontSize: 12,
           fontWeight: FontWeight.w500,
           fontFamily: 'Inter',

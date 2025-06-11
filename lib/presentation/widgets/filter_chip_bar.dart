@@ -161,7 +161,7 @@ class FilterChipBar extends ConsumerWidget {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: FontWeight.w500,
                 color: Theme.of(context).primaryColor,
               ),
@@ -181,7 +181,7 @@ class FilterChipBar extends ConsumerWidget {
                 ),
                 child: Icon(
                   Icons.close,
-                  size: 12,
+                  size: 18,
                   color: Theme.of(context).primaryColor,
                 ),
               ),
