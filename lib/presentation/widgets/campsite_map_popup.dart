@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:campsite_finder/core/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import '../../models/campsite.dart';
@@ -32,30 +33,17 @@ class CampsiteMapPopup extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Drag handle
-          Center(
-            child: Container(
-              margin: const EdgeInsets.only(top: 8),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-
           // Campsite image
           ClipRRect(
             borderRadius: const BorderRadius.vertical(
               top: Radius.circular(AppConstants.radiusMedium),
             ),
             child: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: Image.network(
-                campsite.photo,
+              aspectRatio: 4 / 3,
+              child: CachedNetworkImage(
+                imageUrl: campsite.photo,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
+                errorWidget: (context, url, error) => Container(
                   color: Colors.grey[300],
                   child: const Icon(
                     Icons.image_not_supported,
@@ -63,8 +51,7 @@ class CampsiteMapPopup extends StatelessWidget {
                     color: Colors.grey,
                   ),
                 ),
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
+                placeholder: (context, url) {
                   return Container(
                     color: Colors.grey[200],
                     child: const Center(
