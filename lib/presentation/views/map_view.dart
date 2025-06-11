@@ -289,7 +289,7 @@ class _MapViewState extends ConsumerState<MapView> {
   double _getClusterDistance(double zoom) {
     // More aggressive clustering at lower zoom levels
     if (zoom <= 4) return 500; // 600km
-    if (zoom <= 6) return 200; // 200km
+    if (zoom <= 6) return 300; // 300km
     if (zoom <= 8) return 50;  // 50km
     if (zoom <= 10) return 25; // 25km
     if (zoom <= 12) return 10; // 10km
