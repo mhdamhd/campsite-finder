@@ -18,6 +18,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _slideAnimation;
+  late final TextEditingController _searchController;
 
   // Local state for filters (to allow cancel functionality)
   String? _searchQuery;
@@ -48,7 +49,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet>
     // Initialize with current filter values
     final currentFilters = ref.read(filtersProvider);
     _initializeWithCurrentFilters(currentFilters);
-
+    _searchController= TextEditingController(text: _searchQuery ?? '');
     _animationController.forward();
   }
 
@@ -76,6 +77,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet>
   @override
   void dispose() {
     _animationController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -107,6 +109,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet>
       _maxPrice = null;
       _selectedCountry = null;
       _priceRange = null;
+      _searchController.clear();
     });
   }
 
@@ -223,7 +226,10 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet>
             prefixIcon: const Icon(Icons.search),
             suffixIcon: _searchQuery?.isNotEmpty == true
                 ? IconButton(
-              onPressed: () => setState(() => _searchQuery = null),
+              onPressed: () => setState(() {
+                _searchQuery = null;
+                _searchController.clear();
+              }),
               icon: const Icon(Icons.clear),
             )
                 : null,
@@ -232,7 +238,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet>
             ),
           ),
           onChanged: (value) => setState(() => _searchQuery = value.isEmpty ? null : value),
-          controller: TextEditingController(text: _searchQuery ?? ''),
+          controller: _searchController,
         ),
       ],
     ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.1);
